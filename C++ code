@@ -1,0 +1,1119 @@
+#include<iostream>
+#include<cstdio>
+#include<fstream>
+#include<sstream>
+#include<string>
+#include<cstdlib>
+#include<conio.h>
+#include<windows.h>
+#include<mysql.h>
+#include<iomanip>
+#include<ctime>
+#include<chrono>
+
+using namespace std;
+
+
+
+// Global Variable
+int qstate;
+MYSQL* conn;
+MYSQL_ROW row;
+MYSQL_RES* res;
+string admin_ID;
+string staff_ID;
+// Global Variable End
+
+void Admin();
+void Staff();
+void Register();
+void RegisterAdmin();
+void RegisterStaff();
+void MainMenu();
+void MenuLogin();
+void MenuAdmin();
+void MenuStaff();
+void RegisterFruit();
+void AdminUpdateFruit();
+void AdminSearchFruit();
+void AdminDisplayFruit();
+void AdminDeleteFruit();
+void StaffUpdateFruit();
+void StaffSearchFruit();
+void StaffDisplayFruit();
+void FruitPrice();
+
+
+class db_response
+{
+public:
+	static void ConnectionFunction()
+	{
+		conn = mysql_init(0);
+		if (conn)
+		{
+			cout << "Database Successfully Connected" << endl;
+			system("cls");
+		}
+
+		else
+			cout << "Database Failed To Connect" << mysql_errno(conn) << endl;
+
+		conn = mysql_real_connect(conn, "localhost", "root", "", "db_fruit", 3306, NULL, 0);
+
+		if (conn)
+		{
+			cout << "Successfully Connected To MySQL" << conn << endl;
+			system("pause");
+
+		}
+
+		else
+			cout << "Failed To Connect To Database" << mysql_errno(conn) << endl;
+	}
+};
+
+
+int main() {
+
+    system("cls");
+    system("FRUIT STOCK MANAGEMENT SYSTEM");
+    db_response::ConnectionFunction();
+    MainMenu();
+    return 0;
+}
+
+//Main Menu
+void MainMenu() {
+    int choice;
+
+    system("cls");
+    cout << endl << endl << endl << endl << endl << endl;
+    cout << "\t\t\t\t\t\t============================================" << "\n";
+    cout << "\t\t\t\t\t\t  WELCOME TO FRUIT STOCK MANAGEMENT SYSTEM  " << "\n";
+    cout << "\t\t\t\t\t\t============================================" << "\n\n";
+    cout << "\t\t\t 	   		       Select the following operations" << endl << endl;
+    cout << "\t\t\t 			       [1] Login" << endl;
+    cout << "\t\t\t 			       [2] Register" << endl;
+    cout << "\t\t\t 			       [3] Exit" << endl;
+    cout << endl;
+    cin.clear();
+    cout << "\t\t\t 			       Your selection: ";
+    cin >> choice;
+    system("cls");
+    switch (choice) {
+    case 1:MenuLogin(); break;
+    case 2:Register(); break;
+    case 3:exit(0);
+    default:cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl << "\t\t\t\tInvalid selection! \n\n\t\t\t\t\t\tPlease enter valid operation!";Sleep(1000);
+        cout << endl << endl << endl << endl << endl << endl << endl << endl << endl <<  "\t\t\t\t\t\t";
+        system("pause"); 
+        system("cls"); 
+        MainMenu();
+    }
+}
+
+//Login Menu
+void MenuLogin() {
+    int choice;
+    system("cls");
+
+    cout << endl << endl << endl << endl << endl << endl;
+    cout << "\t\t\t\t\t\t===========================================" << "\n";
+    cout << "\t\t\t\t\t\t                   LOGIN                   " << "\n";
+    cout << "\t\t\t\t\t\t===========================================" << "\n\n";
+    cout << "\t\t\t	   			Select the following operations" << endl << endl;
+    cout << "\t\t\t				[1] Admin" << endl;
+    cout << "\t\t\t 				[2] Staff" << endl;
+    cout << "\t\t\t 				[3] Main Menu" << endl;
+    cout << endl;
+    cin.clear();
+    cout << "\t\t\t 				Your selection: ";
+    cin >> choice;
+    system("cls");
+    switch (choice) {
+    case 1:Admin(); break;
+    case 2:Staff(); break;
+    case 3:MainMenu();
+    default: cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl << "\t\t\t\tInvalid selection! \n\n\t\t\t\t\t\tPlease enter valid operation!";  Sleep(1000);
+        cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << "\t\t\t\t\t\t";
+        system("pause");
+        system("cls");
+        MenuLogin();
+    }
+}
+
+//Register Menu
+void Register() {
+    string name, id, password;
+    int choice;
+    system("cls");
+    cout << endl << endl << endl << endl << endl << endl;
+    cout << endl << endl << endl << endl << endl << endl;
+    cout << "\t\t\t\t\t\t===========================================" << "\n";
+    cout << "\t\t\t\t\t\t                 REGISTER                  " << "\n";
+    cout << "\t\t\t\t\t\t===========================================" << "\n\n";
+    cout << "\t\t\t 	   			Select the following operations" << endl << endl;
+    cout << "\t\t\t 				[1] Admin" << endl;
+    cout << "\t\t\t 				[2] Staff" << endl;
+    cout << "\t\t\t 				[3] Main Menu" << endl;
+    cout << endl;
+    cin.clear();
+    cout << "\t\t\t 				Your selection: ";
+    cin >> choice;
+    system("cls");
+    switch (choice) {
+    case 1:RegisterAdmin(); break;
+    case 2:RegisterStaff(); break;
+    case 3:MainMenu();
+    default: cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
+        cout << "\t\t\t\tInvalid selection! \n\n\t\t\t\t\t\tPlease enter valid operation!";  Sleep(1000);
+        cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << "\t\t\t\t\t\t";
+        system("pause");
+        system("cls");
+        Register();
+    }
+}
+
+//Register Admin
+void RegisterAdmin() {
+    string name, id, password;
+    
+    system("cls");
+    cout << endl << endl << endl << endl << endl << endl;
+    cout << endl << endl << endl << endl << endl << endl;
+    cout << "\t\t\t\t\t\t============================================" << "\n";
+    cout << "\t\t\t\t\t\t               REGISTER ADMIN               " << "\n";
+    cout << "\t\t\t\t\t\t============================================" << "\n\n";
+   
+    cin.ignore(1, '\n');
+    cout << "\t\t\t\t\t\tName: ";
+    getline(cin, name);
+    cout << "\t\t\t\t\t\tID: ";
+    getline(cin, id);
+    cout << "\t\t\t\t\t\tPassword: ";
+    getline(cin, password);
+
+    string check_id = "Select * from admin where Admin_ID = '" + id + "'";
+    const char* check = check_id.c_str();
+    qstate = mysql_query(conn, check);
+
+    if (!qstate)
+    {
+        res = mysql_store_result(conn);
+
+        if (res->row_count == 1) {
+            cout << endl << "\t\t\t\t\t\tFailed registered! ID already exist" << endl;
+            system("pause");
+            RegisterAdmin();
+        }
+
+        else {
+            string register_query = "insert into admin(Admin_ID, Admin_Name, Admin_Password) values('" + id + "', '" + name + "', '" + password + "')";
+            const char* reg = register_query.c_str();
+            qstate = mysql_query(conn, reg);
+
+            if (!qstate) {
+                cout << endl << "\t\t\t\t\t\tSuccesfully registered" << endl;
+            }
+
+            else {
+                cout << "\t\t\t\t\t\tFailed to register" << mysql_errno(conn) << endl;
+            }
+
+        }
+    }
+    cout << "Press Enter To Back...";
+    _getch();
+    MainMenu();
+}
+
+//Register Staff
+void RegisterStaff() {
+    string name, id, password;
+    
+    system("cls");
+    cout << endl << endl << endl << endl << endl << endl;
+    cout << endl << endl << endl << endl << endl << endl;
+    cout << "\t\t\t\t\t\t============================================" << "\n";
+    cout << "\t\t\t\t\t\t               REGISTER STAFF               " << "\n";
+    cout << "\t\t\t\t\t\t============================================" << "\n\n";
+
+    cin.ignore(1, '\n');
+    cout << "\t\t\t\t\t\tName: ";
+    getline(cin, name);
+    cout << "\t\t\t\t\t\tID: ";
+    getline(cin, id);
+    cout << "\t\t\t\t\t\tPassword: ";
+    getline(cin, password);
+
+    string check_id = "Select * from staff where Staff_ID = '" + id + "'";
+    const char* check = check_id.c_str();
+    qstate = mysql_query(conn, check);
+
+    if (!qstate)
+    {
+        res = mysql_store_result(conn);
+
+        if (res->row_count == 1) {
+            cout << endl << "\t\t\t\t\t\tFailed registered! ID already exist" << endl;
+            system("pause");
+            RegisterStaff();
+        }
+
+        else {
+            string register_query = "insert into staff(Staff_ID, Staff_Name, Staff_Password) values('" + id + "', '" + name + "', '" + password + "')";
+            const char* reg = register_query.c_str();
+            qstate = mysql_query(conn, reg);
+
+            if (!qstate) {
+                cout << endl << "\t\t\t\t\t\tSuccesfully registered" << endl;
+            }
+
+            else {
+                cout << "\t\t\t\t\t\tFailed to register" << mysql_errno(conn) << endl;
+            }
+
+        }
+    }
+
+    cout << "Press Enter To Back...";
+    _getch();
+    MainMenu();
+}
+
+//Login for Admin
+void Admin() {
+    
+reAttempt:
+    int attempt = 0;
+    system("cls");
+    cout << "\t\t\t\t\t\t===========================================" << "\n";
+    cout << "\t\t\t\t\t\t               ADMIN LOGIN                 " << "\n";
+    cout << "\t\t\t\t\t\t===========================================" << "\n\n";
+EnterAgain:
+    cout << "\t\t\t\t\t\tAdmin ID:      ";
+    cin >> admin_ID;
+    cout << "\t\t\t\t\t\tPassword:      ";
+    char password[32];//to store password.
+    int i = 0;
+    char a;//a Temp char
+    for (i = 0;;)//infinite loop
+    {
+        a = _getch();//stores char typed in a
+        if ((a >= 'a' && a <= 'z') || (a >= 'A' && a <= 'Z') || (a >= '0' && a <= '9'))
+            //check if a is numeric or alphabet
+        {
+            password[i] = a;//stores a in pass
+            ++i;
+            cout << "*";
+        }
+        if (a == '\b' && i >= 1)//if user typed backspace
+        //i should be greater than 1.
+        {
+            cout << "\b \b";//rub the character behind the cursor.
+            --i;
+        }
+        if (a == '\r')//if enter is pressed
+        {
+            password[i] = '\0';//null means end of string.
+            break;//break the loop
+        }
+    }
+
+
+    string checkAdmin_query = "select Admin_ID from admin where Admin_ID = '" +admin_ID+"' and Admin_Password = '"+password+"'";
+    const char* ca = checkAdmin_query.c_str();
+    qstate = mysql_query(conn, ca);
+
+    if (!qstate)
+    {
+        res = mysql_store_result(conn);
+        if (res->row_count == 1)
+        {
+            while (row = mysql_fetch_row(res))
+                admin_ID = row[0];
+            cout << endl << endl << endl;
+            cout << "\t\t\t\t\t\t===========================================" << "\n";
+            cout << "\t\t\t\t\t\t               LOGIN SUCCESS!              " << "\n";
+            cout << "\t\t\t\t\t\t===========================================" << "\n";
+            cout << endl;
+            system("pause");
+            system("cls");
+            MenuAdmin();
+        }
+
+        else {
+            cout << endl << endl << endl;
+            //cout << "\t\t\t\t\t\t===========================================" << "\n";
+            cout << "\t\t\t\t\t\t\tINVALID ID OR INCORRECT PASSWORD   " << "\n";
+            //cout << "\t\t\t\t\t\t===========================================" << "\n";
+            attempt++;
+            if (attempt == 3)
+            {
+                cout << endl;
+                cout << "\t\t\t\t\t     You have entered 3 time with invalid id or password" << endl;
+                cout << "\t\t\t\t\t\t\t      Freeze 5 seconds" << endl;
+                Sleep(5000);
+                goto reAttempt;
+            }
+            cout << endl;
+            goto EnterAgain;
+        }
+    }
+    else {
+        cout << "SQL error." << endl;
+    }
+}
+
+//Login for Staff
+void Staff() {
+
+reAttempt:
+    int attempt = 0;
+    system("cls");
+    cout << "\t\t\t\t\t\t===========================================" << "\n";
+    cout << "\t\t\t\t\t\t               STAFF LOGIN                 " << "\n";
+    cout << "\t\t\t\t\t\t===========================================" << "\n\n";
+   
+EnterAgain:
+    cout << "\t\t\t\t\t\tStaff ID:      ";
+    cin >> staff_ID;
+    cout << "\t\t\t\t\t\tPassword:      ";
+    char password[32];//to store password.
+    int i = 0;
+    char a;//a Temp char
+    for (i = 0;;)//infinite loop
+    {
+        a = _getch();//stores char typed in a
+        if ((a >= 'a' && a <= 'z') || (a >= 'A' && a <= 'Z') || (a >= '0' && a <= '9'))
+            //check if a is numeric or alphabet
+        {
+            password[i] = a;//stores a in pass
+            ++i;
+            cout << "*";
+        }
+        if (a == '\b' && i >= 1)//if user typed backspace
+        //i should be greater than 1.
+        {
+            cout << "\b \b";//rub the character behind the cursor.
+            --i;
+        }
+        if (a == '\r')//if enter is pressed
+        {
+            password[i] = '\0';//null means end of string.
+            break;//break the loop
+        }
+    }
+
+    string checkStaff_query = "select Staff_ID from staff where Staff_ID =  '" + staff_ID + "' and Staff_Password = '" + password + "'";
+    const char* cs = checkStaff_query.c_str();
+    qstate = mysql_query(conn, cs);
+
+    if (!qstate)
+    {
+        res = mysql_store_result(conn);
+        if (res->row_count == 1)
+        {
+            while (row = mysql_fetch_row(res))
+                staff_ID = row[0];
+            cout << endl << endl << endl;
+            cout << "\t\t\t\t\t\t===========================================" << "\n";
+            cout << "\t\t\t\t\t\t               LOGIN SUCCESS!              " << "\n";
+            cout << "\t\t\t\t\t\t===========================================" << "\n";
+            cout << endl;
+            system("pause");
+            system("cls");
+            MenuStaff();
+        }
+
+        else {
+            cout << endl << endl << endl;
+            cout << "\t\t\t\t\t\t\tINVALID ID OR INCORRECT PASSWORD   " << "\n";
+            attempt++;
+            if (attempt == 3)
+            {
+                cout << endl;
+                cout << "\t\t\t\t\t     You have entered 3 time with invalid id or password" << endl;
+                cout << "\t\t\t\t\t\t\t      Freeze 5 seconds" << endl;
+                Sleep(5000);
+                goto reAttempt;
+            }
+            cout << endl;
+            goto EnterAgain;
+        }
+    }
+
+    else {
+        cout << "SQL error." << endl;
+    }
+    
+}
+
+//Menu for Admin
+void MenuAdmin() {
+    int choice;
+    
+    system("cls");
+    cout << endl << endl << endl << endl << endl << endl;
+    cout << "\t\t\t\t\t\t===========================================" << "\n";
+    cout << "\t\t\t\t\t\t              ADMIN MENU                   " << "\n";
+    cout << "\t\t\t\t\t\t===========================================" << "\n\n";
+    cout << "\t\t\t 	   			Select the following operations" << endl << endl;
+    cout << "\t\t\t 				[1] Register Fruit    " << endl;
+    cout << "\t\t\t 				[2] Update Fruit      " << endl;
+    cout << "\t\t\t 				[3] Search Fruit      " << endl;
+    cout << "\t\t\t 				[4] Delete Fruit      " << endl;
+    cout << "\t\t\t 				[5] Display Fruit     " << endl;
+    cout << "\t\t\t 				[6] Log Out" << endl;
+    cout << endl;
+    cin.clear();
+    cout << "\t\t\t 				Your selection: ";
+    cin >> choice;
+    system("cls");
+    switch (choice) {
+    case 1:RegisterFruit(); break;
+    case 2:AdminUpdateFruit(); break;
+    case 3:AdminSearchFruit(); break;
+    case 4:AdminDeleteFruit(); break;
+    case 5:AdminDisplayFruit(); break;
+    case 6:MainMenu();
+    default: cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl << "\t\t\t\tInvalid selection! \n\n\t\t\t\t\t\tPlease enter valid operation!";  Sleep(1000);
+        cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << "\t\t\t\t\t\t";
+        system("pause");
+        system("cls");
+        MenuAdmin();
+    }
+}
+
+//Menu for Staff
+void MenuStaff() {
+    int choice;
+
+    system("cls");
+    cout << endl << endl << endl << endl << endl << endl;
+    cout << "\t\t\t\t\t\t===========================================" << "\n";
+    cout << "\t\t\t\t\t\t              STAFF MENU                   " << "\n";
+    cout << "\t\t\t\t\t\t===========================================" << "\n\n";
+    cout << "\t\t\t 	   			Select the following operations" << endl << endl;
+    cout << "\t\t\t 				[1] Update Fruit" << endl;
+    cout << "\t\t\t 				[2] Search Fruit" << endl;
+    cout << "\t\t\t 				[3] Display Fruit" << endl;
+    cout << "\t\t\t 				[4] Calculate Fruit Price" << endl;
+    cout << "\t\t\t 				[5] Log Out" << endl;
+    cout << endl;
+    cin.clear();
+    cout << "\t\t\t 				Your selection: ";
+    cin >> choice;
+    system("cls");
+    switch (choice) {
+    case 1:StaffUpdateFruit(); break;
+    case 2:StaffSearchFruit(); break;
+    case 3:StaffDisplayFruit(); break;
+    case 4:FruitPrice(); break;
+    case 5:MainMenu();
+    default: cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl << "\t\t\t\tInvalid selection! \n\n\t\t\t\t\t\tPlease enter valid operation!";  Sleep(1000);
+        cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << "\t\t\t\t\t\t";
+        system("pause");
+        system("cls");
+        MenuStaff();
+    }
+}
+
+//Add fruit to database for Admin
+void RegisterFruit() {
+    string  fruit_name, fruit_price, fruit_quantity,fruit_arrive, fruit_expired;
+    char choose;
+
+    system("cls");
+    cout << "\t\t\t\t\t\t===========================================" << "\n";
+    cout << "\t\t\t\t\t\t            REGISTER FRUIT                 " << "\n";
+    cout << "\t\t\t\t\t\t===========================================" << "\n\n";
+
+    cin.ignore(1);
+    cout << "\t\t\t\t\t\tFruit name: ";
+    getline(cin, fruit_name);
+    
+    string check_name = "Select * from fruit_stock where Fruit_Name = '" + fruit_name + "'";
+    const char* name = check_name.c_str();
+    qstate = mysql_query(conn, name);
+
+    if (!qstate) {
+
+        res = mysql_store_result(conn);
+
+        if (res->row_count == 1) {
+            cout << endl << "\t\t\t\t\t\tFruit already exist in database." << endl;
+            system("pause");
+            RegisterFruit();
+        }
+
+        else {
+            cout << "\t\t\t\t\t\tDate fruit arrive (YYYY-MM-DD): ";
+            getline(cin, fruit_arrive);
+            cout << "\t\t\t\t\t\tDate fruit expired (YYYY-MM-DD): ";
+            getline(cin, fruit_expired);
+            cout << "\t\t\t\t\t\tFruit price(kg): RM ";
+            getline(cin, fruit_price);
+            cout << "\t\t\t\t\t\tFruit quantity: ";
+            getline(cin, fruit_quantity);
+       
+            string insert_query = "insert into fruit_stock (Fruit_Name, Fruit_DateArrive, Fruit_DateExpired, Fruit_Price, Fruit_Quantity, Admin_ID) values ('" + fruit_name + "', '" + fruit_arrive + "', '" + fruit_expired + "', '" + fruit_price + "', '" + fruit_quantity + "', '"+admin_ID+"')";
+            const char* ins = insert_query.c_str();
+            qstate = mysql_query(conn, ins);
+
+            if (!qstate) {
+                cout << endl << "\t\t\t\t\t\tFruit is successful added in database." << endl;
+            }
+
+            else {
+                cout << "\t\t\t\t\t\tFailed to add fruit in database!" << mysql_errno(conn) << endl;
+            }
+        }
+    }
+
+    do {
+        cout << "\t\t\t\t\t\tDo you want to add another fruit? (y/n): ";
+        cin >> choose;
+        if (choose == 'y' || choose == 'Y')
+            RegisterFruit();
+        else if (choose == 'n' || choose == 'N')
+            AdminDisplayFruit();
+    } while (choose == 'y' || choose == 'Y' || choose == 'n' || choose == 'N');
+}
+
+//Update fruit to database for Admin
+void AdminUpdateFruit() {
+ 
+    string data, fruitID;
+    int choose;
+    char option;
+    system("cls");
+    cout << "\t\t\t\t\t\t===========================================" << "\n";
+    cout << "\t\t\t\t\t\t              UPDATE FRUIT                 " << "\n";
+    cout << "\t\t\t\t\t\t===========================================" << "\n\n";
+
+    qstate = mysql_query(conn, "select Fruit_ID, Fruit_Name, Fruit_DateArrive, Fruit_DateExpired, Fruit_Price, Fruit_Quantity from fruit_stock");
+
+    if (!qstate) {
+        cout << "\t\t\t\t******************************************************************************" << endl;
+        cout << "\t\t\t\t| " << setw(5) << "Fruit ID |" << setw(14) << " Fruit Name |" << setw(14) << " Date Arrive |" << setw(14) << " Date Expired |" << setw(9) << " Price(kg) |" << setw(6) << " Quantity |" << endl;
+        cout << "\t\t\t\t******************************************************************************" << endl;
+
+        res = mysql_store_result(conn);
+        while (row = mysql_fetch_row(res)) {
+            cout << "\t\t\t\t" << setw(7) << row[0] << setw(17) << row[1] << setw(14) << row[2] << setw(14) << row[3] << setw(10) << row[4] << setw(11) << row[5] << endl;
+            cout << "\t\t\t\t******************************************************************************" << endl;
+        }
+
+        cout << endl;
+        cout << "\t\t\t\t\t\tChoose ID: ";
+        cin >> fruitID;
+        cout << endl;
+
+        string check_id = "Select * from fruit_stock where Fruit_ID = '" + fruitID + "'";
+        const char* id = check_id.c_str();
+        qstate = mysql_query(conn, id);
+
+        if (!qstate) {
+
+            res = mysql_store_result(conn);
+
+            if (res->row_count == 1) {
+                cout << "\t\t\t 	   		Select the following category to update" << endl << endl;
+                cout << "\t\t\t 			[1] Fruit Name          [2] Date Arrive" << endl;
+                cout << "\t\t\t 			[3] Date Expired        [4] Fruit Price" << endl;
+                cout << "\t\t\t 			[5] Fruit Quantity" << endl;
+                cout << endl;
+                cout << "\t\t\t 				Your selection: ";
+                cin >> choose;
+                cout << endl;
+
+                cin.ignore(1, '\n');
+                if (choose == 1) {
+                    cout << "\t\t\t\t\t\tNew Fruit Name: ";
+                    getline(cin, data);
+
+                    string update_query = "update fruit_stock set Fruit_Name = '" + data + "' , Admin_ID = '" + admin_ID + "' where Fruit_ID = '" + fruitID + "' ";
+                    const char* up = update_query.c_str();
+                    qstate = mysql_query(conn, up);
+                }
+
+                else if (choose == 2) {
+                    cout << "\t\t\t\t\t\tNew Date Arrive (YYYY-MM-DD): ";
+                    getline(cin, data);
+
+                    string update_query = "update fruit_stock set Fruit_DateArrive = '" + data + "', Admin_ID = '" + admin_ID + "' where Fruit_ID = '" + fruitID + "' ";
+                    const char* up = update_query.c_str();
+                    qstate = mysql_query(conn, up);
+                }
+
+                else if (choose == 3) {
+                    cout << "\t\t\t\t\t\tNew Date Expired (YYYY-MM-DD): ";
+                    getline(cin, data);
+
+                    string update_query = "update fruit_stock set Fruit_DateExpired = '" + data + "' , Admin_ID = '" + admin_ID + "' where Fruit_ID = '" + fruitID + "' ";
+                    const char* up = update_query.c_str();
+                    qstate = mysql_query(conn, up);
+                }
+
+                else if (choose == 4) {
+                    cout << "\t\t\t\t\t\tNew Fruit Price(kg): RM ";
+                    getline(cin, data);
+
+                    string update_query = "update fruit_stock set Fruit_Price = '" + data + "' , Admin_ID = '" + admin_ID + "' where Fruit_ID = '" + fruitID + "' ";
+                    const char* up = update_query.c_str();
+                    qstate = mysql_query(conn, up);
+                }
+
+                else if (choose == 5) {
+                    cout << "\t\t\t\t\t\tNew Fruit Quantity: ";
+                    getline(cin, data);
+
+                    string update_query = "update fruit_stock set Fruit_Quantity = '" + data + "' , Admin_ID = '" + admin_ID + "' where Fruit_ID = '" + fruitID + "' ";
+                    const char* up = update_query.c_str();
+                    qstate = mysql_query(conn, up);
+                }
+            }
+
+            else {
+                cout << "\t\t\t\t\t\tFruit id not exist in database!" << endl;
+            }
+        }
+
+        do {
+            cout << "\t\t\t\t\t\tDo you want to update other fruit? (y/n): ";
+            cin >> option;
+            if (option == 'y' || option == 'Y')
+                AdminUpdateFruit();
+            else if (option == 'n' || option == 'N')
+                AdminDisplayFruit();
+        } while (option == 'y' || option == 'Y' || option == 'n' || option == 'N');        
+    }
+
+    else {
+        cout << "\t\t\t\t\t\tFailed to update the data in database!" << endl;
+    }
+
+}
+
+//Display fruit database for Admin
+void AdminDisplayFruit() {
+
+    system("cls");
+    cout << "\t\t\t\t\t\t===========================================" << "\n";
+    cout << "\t\t\t\t\t\t             LIST OF FRUIT                 " << "\n";
+    cout << "\t\t\t\t\t\t===========================================" << "\n\n";
+
+    //date_format() used to convert the format of date.
+    qstate = mysql_query(conn, "select Fruit_ID, Fruit_Name, Fruit_DateArrive, Fruit_DateExpired, Fruit_Price, Fruit_Quantity from fruit_stock");
+
+    if (!qstate)
+    {
+        //cin.ignore(1, '\n');
+        cout << "\t\t\t\t******************************************************************************" << endl;
+        cout << "\t\t\t\t| " << setw(5) << "Fruit ID |" << setw(14) << " Fruit Name |" << setw(14) << " Date Arrive |" << setw(14) << " Date Expired |" << setw(9) << " Price(kg) |" << setw(6) << " Quantity |" << endl;
+        cout << "\t\t\t\t******************************************************************************" << endl;
+
+        res = mysql_store_result(conn);
+        while (row = mysql_fetch_row(res)) {
+            cout << "\t\t\t\t" << setw(7) << row[0] << setw(17) << row[1] << setw(14) << row[2] << setw(14) << row[3] << setw(10) << row[4] << setw(11) << row[5] << endl;
+            cout << "\t\t\t\t******************************************************************************" << endl;
+        }
+    }
+    else
+    {
+        cout << "Query Execution Problem!" << mysql_errno(conn) << endl;
+    }
+
+    cout << "Press Enter To Back...";
+    _getch();
+    MenuAdmin();
+
+}
+
+//Delete fruit in database for Admin
+void AdminDeleteFruit() {
+    char choose;
+    string fruitID;
+   
+    system("cls");
+    cout << "\t\t\t\t\t\t===========================================" << "\n";
+    cout << "\t\t\t\t\t\t              DELETE FRUIT                 " << "\n";
+    cout << "\t\t\t\t\t\t===========================================" << "\n\n";
+   
+    qstate = mysql_query(conn, "select Fruit_ID, Fruit_Name, Fruit_DateArrive, Fruit_DateExpired, Fruit_Price, Fruit_Quantity from fruit_stock");
+
+    if (!qstate)
+    {
+        cout << "\t\t\t\t******************************************************************************" << endl;
+        cout << "\t\t\t\t| " << setw(5) << "Fruit ID |" << setw(14) << " Fruit Name |" << setw(14) << " Date Arrive |" << setw(14) << " Date Expired |" << setw(9) << " Price(kg) |" << setw(6) << " Quantity |" << endl;
+        cout << "\t\t\t\t******************************************************************************" << endl;
+
+        res = mysql_store_result(conn);
+        while (row = mysql_fetch_row(res)) {
+            cout << "\t\t\t\t" << setw(7) << row[0] << setw(17) << row[1] << setw(14) << row[2] << setw(14) << row[3] << setw(10) << row[4] << setw(11) << row[5] << endl;
+            cout << "\t\t\t\t******************************************************************************" << endl;  
+        }
+
+        cout << endl;
+        cout << "\t\t\t 				Choose ID: ";
+        cin >> fruitID;
+        
+        string check_id = "Select * from fruit_stock where Fruit_ID = '" + fruitID + "'";
+        const char* ch = check_id.c_str();
+        qstate = mysql_query(conn, ch);
+
+        if (!qstate) {
+            res = mysql_store_result(conn);
+
+            if (res->row_count == 1) {
+                string delete_query = "delete from fruit_stock where Fruit_ID = '" + fruitID + "' ";
+                const char* del = delete_query.c_str();
+
+                qstate = mysql_query(conn, del);
+
+                if (!qstate) {
+                    cout << "\t\t\t\t\t\t Successfully delete fruit from database";
+                }
+
+                else {
+                    cout << "\t\t\t\t\t\t Failed to delete fruit in database!";
+                }
+            }
+
+            else {
+                cout << endl;
+                cout << "\t\t\t\t\t\t Fruit ID does not exist";
+                cout << endl << endl;
+            }
+        }
+        cout << "\t\t\t\t\t\t Do you want to delete other fruit? (y/n): ";
+        cin >> choose;
+        if (choose == 'y' || choose == 'Y')
+            AdminDeleteFruit();
+        else if (choose == 'n' || choose == 'N')
+            AdminDisplayFruit();
+    }
+}
+
+//Search fruit in database for Admin
+void AdminSearchFruit() {
+    char choose;
+    string fruitName;
+
+    system("cls");
+    cout << "\t\t\t\t\t\t===========================================" << "\n";
+    cout << "\t\t\t\t\t\t              SEARCH FRUIT                 " << "\n";
+    cout << "\t\t\t\t\t\t===========================================" << "\n\n";
+
+    cin.ignore(1, '\n');
+    cout << "\t\t\t\t\t\tSearch fruit by name: ";
+    getline(cin, fruitName);
+
+    
+    string search_query = "select Fruit_ID, Fruit_Name, Fruit_DateArrive, Fruit_DateExpired, Fruit_Price, Fruit_Quantity from fruit_stock where Fruit_Name  = '"+fruitName+"'"; /*like '%" + fruitName + "%'*/
+    const char* search = search_query.c_str();
+    qstate = mysql_query(conn, search);
+
+    if (!qstate)
+    {
+        res = mysql_store_result(conn);
+        if (res->row_count == 1)
+        {
+            cout << "\t\t\t\t******************************************************************************" << endl;
+            cout << "\t\t\t\t| " << setw(5) << "Fruit ID |" << setw(14) << " Fruit Name |" << setw(14) << " Date Arrive |" << setw(14) << " Date Expired |" << setw(9) << " Price(kg) |" << setw(6) << " Quantity |" << endl;
+            cout << "\t\t\t\t******************************************************************************" << endl;
+
+            //res = mysql_store_result(conn);
+            while (row = mysql_fetch_row(res)) {
+                cout << "\t\t\t\t" << setw(7) << row[0] << setw(17) << row[1] << setw(14) << row[2] << setw(14) << row[3] << setw(10) << row[4] << setw(11) << row[5] << endl;
+                cout << "\t\t\t\t******************************************************************************" << endl;
+            }
+        }
+
+        else {
+            cout << "\t\t\t\t\t\tFruit does not exist in database!";
+            cout << endl << endl;
+        }
+        
+    }
+
+    cout << endl;
+    cout << "\t\t\t\t\t\tDo you want to search other fruit? (y/n): ";
+    cin >> choose;
+    if (choose == 'y' || choose == 'Y')
+        AdminSearchFruit();
+    else if (choose == 'n' || choose == 'N')
+        MenuAdmin();
+}
+
+//Update fruit in database for Staff
+void StaffUpdateFruit() {
+    string data, fruitID;
+    int choose;
+    char option;
+    system("cls");
+    cout << "\t\t\t\t\t\t===========================================" << "\n";
+    cout << "\t\t\t\t\t\t              UPDATE FRUIT                 " << "\n";
+    cout << "\t\t\t\t\t\t===========================================" << "\n\n";
+
+    qstate = mysql_query(conn, "select Fruit_ID, Fruit_Name, Fruit_DateArrive, Fruit_DateExpired, Fruit_Price, Fruit_Quantity from fruit_stock");
+
+    if (!qstate) {
+        cout << "\t\t\t\t******************************************************************************" << endl;
+        cout << "\t\t\t\t| " << setw(5) << "Fruit ID |" << setw(14) << " Fruit Name |" << setw(14) << " Date Arrive |" << setw(14) << " Date Expired |" << setw(9) << " Price(kg) |" << setw(6) << " Quantity |"<<endl;
+        cout << "\t\t\t\t******************************************************************************" << endl;
+
+        res = mysql_store_result(conn);
+        while (row = mysql_fetch_row(res)) {
+            cout << "\t\t\t\t" << setw(7) << row[0] << setw(17) << row[1] << setw(14) << row[2] << setw(14) << row[3] << setw(10) << row[4] << setw(11) << row[5] << endl;
+            cout << "\t\t\t\t***************************************************************************" << endl;
+        }
+
+        cout << endl;
+        cout << "\t\t\t\t\t\tChoose ID: ";
+        cin >> fruitID;
+        cout << endl;
+
+
+        string check_id = "Select * from fruit_stock where Fruit_ID = '" + fruitID + "'";
+        const char* id = check_id.c_str();
+        qstate = mysql_query(conn, id);
+
+        if (!qstate) {
+
+            res = mysql_store_result(conn);
+
+            if (res->row_count == 1) {
+
+                cout << "\t\t\t 	   			Select the following category to update" << endl << endl;
+                cout << "\t\t\t 				[1] Fruit Name          [2] Date Arrive" << endl;
+                cout << "\t\t\t 				[3] Date Expired        [4] Fruit Price" << endl;
+                cout << "\t\t\t 				[5] Fruit Quantity" << endl;
+                cout << endl;
+                cout << "\t\t\t 				Your selection: ";
+                cin >> choose;
+                cout << endl;
+
+                cin.ignore(1, '\n');
+                if (choose == 1) {
+                    cout << "\t\t\t\t\t\tNew Fruit Name: ";
+                    getline(cin, data);
+
+                    string update_query = "update fruit_stock set Fruit_Name = '" + data + "' , Staff_ID = '" + staff_ID + "' where Fruit_ID = '" + fruitID + "' ";
+                    const char* up = update_query.c_str();
+                    qstate = mysql_query(conn, up);
+                }
+
+                else if (choose == 2) {
+                    cout << "\t\t\t\t\t\tNew Date Arrive (YYYY-MM-DD): ";
+                    getline(cin, data);
+
+                    string update_query = "update fruit_stock set Fruit_DateArrive = '" + data + "' , Staff_ID = '" + staff_ID + "' where Fruit_ID = '" + fruitID + "' ";
+                    const char* up = update_query.c_str();
+                    qstate = mysql_query(conn, up);
+                }
+
+                else if (choose == 3) {
+                    cout << "\t\t\t\t\t\tNew Date Expired (YYYY-MM-DD): ";
+                    getline(cin, data);
+
+                    string update_query = "update fruit_stock set Fruit_DateExpired = '" + data + "' , Staff_ID = '" + staff_ID + "' where Fruit_ID = '" + fruitID + "' ";
+                    const char* up = update_query.c_str();
+                    qstate = mysql_query(conn, up);
+                }
+
+                else if (choose == 4) {
+                    cout << "\t\t\t\t\t\tNew Fruit Price(kg): RM ";
+                    getline(cin, data);
+
+                    string update_query = "update fruit_stock set Fruit_Price = '" + data + "' , Staff_ID = '" + staff_ID + "' where Fruit_ID = '" + fruitID + "' ";
+                    const char* up = update_query.c_str();
+                    qstate = mysql_query(conn, up);
+                }
+
+                else if (choose == 5) {
+                    cout << "\t\t\t\t\t\tNew Fruit Quantity: ";
+                    getline(cin, data);
+
+                    string update_query = "update fruit_stock set Fruit_Quantity = '" + data + "' , Staff_ID = '" + staff_ID + "' where Fruit_ID = '" + fruitID + "' ";
+                    const char* up = update_query.c_str();
+                    qstate = mysql_query(conn, up);
+                }
+            }
+
+            else {
+               cout << "\t\t\t\t\t\tFruit id not exist in database!" <<  endl;
+            }
+        }
+
+        do {
+            cout << "\t\t\t\t\t\tDo you want to update other fruit? (y/n): ";
+            cin >> option;
+            if (option == 'y' || option == 'Y')
+                StaffUpdateFruit();
+            else if (option == 'n' || option == 'N')
+                StaffDisplayFruit();
+        } while (option == 'y' || option == 'Y' || option == 'n' || option == 'N');
+    }
+
+    else {
+        cout << "\t\t\t\t\t\tFailed to update the data in database!" << endl;
+    }
+
+}
+
+//Search fruit in databse for staff
+void StaffSearchFruit() {
+    char choose;
+    string fruitName;
+
+    system("cls");
+    cout << "\t\t\t\t\t\t===========================================" << "\n";
+    cout << "\t\t\t\t\t\t              SEARCH FRUIT                 " << "\n";
+    cout << "\t\t\t\t\t\t===========================================" << "\n\n";
+
+    cin.ignore(1, '\n');
+    cout << "\t\t\t\t\t\tSearch fruit by name: ";
+    getline(cin, fruitName);
+
+
+    string search_query = "select Fruit_ID, Fruit_Name, Fruit_DateArrive, Fruit_DateExpired, Fruit_Price, Fruit_Quantity from fruit_stock where Fruit_Name like '%" + fruitName + "%'";
+    const char* search = search_query.c_str();
+    qstate = mysql_query(conn, search);
+
+    if (!qstate)
+    {
+        res = mysql_store_result(conn);
+        if (res->row_count == 1)
+        {
+            cout << "\t\t\t\t******************************************************************************" << endl;
+            cout << "\t\t\t\t| " << setw(5) << "Fruit ID |" << setw(14) << " Fruit Name |" << setw(14) << " Date Arrive |" << setw(14) << " Date Expired |" << setw(9) << " Price(kg) |" << setw(6) << " Quantity |" << endl;
+            cout << "\t\t\t\t******************************************************************************" << endl;
+
+            //res = mysql_store_result(conn);
+            while (row = mysql_fetch_row(res)) {
+                cout << "\t\t\t\t" << setw(7) << row[0] << setw(17) << row[1] << setw(14) << row[2] << setw(14) << row[3] << setw(10) << row[4] << setw(11) << row[5] << endl;
+                cout << "\t\t\t\t*****************************************************************************" << endl;
+            }
+        }
+
+        else {
+            cout << "\t\t\t\t\t\tFruit does not exist in database!";
+        }
+
+    }
+
+    cout << endl;
+    cout << "\t\t\t\t\t\tDo you want to search other fruit? (y/n): ";
+    cin >> choose;
+    if (choose == 'y' || choose == 'Y')
+        StaffSearchFruit();
+    else if (choose == 'n' || choose == 'N')
+        MenuStaff();
+}
+
+//Display fruit database for Staff
+void StaffDisplayFruit() {
+
+    system("cls");
+    cout << "\t\t\t\t\t\t===========================================" << "\n";
+    cout << "\t\t\t\t\t\t             LIST OF FRUIT                 " << "\n";
+    cout << "\t\t\t\t\t\t===========================================" << "\n\n";
+
+   
+    qstate = mysql_query(conn, "select Fruit_ID, Fruit_Name, Fruit_DateArrive, Fruit_DateExpired, Fruit_Price, Fruit_Quantity from fruit_stock");
+
+    if (!qstate)
+    {
+        cout << "\t\t\t\t******************************************************************************" << endl;
+        cout << "\t\t\t\t| " << setw(5) << "Fruit ID |" << setw(14) << " Fruit Name |" << setw(14) << " Date Arrive |" << setw(14) << " Date Expired |" << setw(9) << " Price(kg) |" << setw(6) << " Quantity |" << endl;
+        cout << "\t\t\t\t******************************************************************************" << endl;
+
+        res = mysql_store_result(conn);
+        while (row = mysql_fetch_row(res)) {
+            cout << "\t\t\t\t" << setw(7) << row[0] << setw(17) << row[1] << setw(14) << row[2] << setw(14) << row[3] << setw(10) << row[4] << setw(11) << row[5] << endl;
+            cout << "\t\t\t\t******************************************************************************" << endl;
+        }
+    }
+    else
+    {
+        cout << "Query Execution Problem!" << mysql_errno(conn) << endl;
+    }
+
+    cout << "Press Enter To Back...";
+    _getch();
+    MenuStaff();
+}
+
+//Calculate fruit price
+void FruitPrice() {
+    string name, price;
+    double total, kg;
+    char choose;
+    system("cls");
+    cout << "\t\t\t\t\t\t===========================================" << "\n";
+    cout << "\t\t\t\t\t\t              CALCULATE FRUIT              " << "\n";
+    cout << "\t\t\t\t\t\t===========================================" << "\n\n";
+
+    qstate = mysql_query(conn, "select Fruit_ID, Fruit_Name, Fruit_DateArrive, Fruit_DateExpired, Fruit_Price, Fruit_Quantity from fruit_stock");
+    if (!qstate) {
+        cout << "\t\t\t\t******************************************************************************" << endl;
+        cout << "\t\t\t\t| " << setw(5) << "Fruit ID |" << setw(14) << " Fruit Name |" << setw(14) << " Date Arrive |" << setw(14) << " Date Expired |" << setw(9) << " Price(kg) |" << setw(6) << " Quantity |" << endl;
+        cout << "\t\t\t\t******************************************************************************" << endl;
+
+        res = mysql_store_result(conn);
+        while (row = mysql_fetch_row(res)) {
+            cout << "\t\t\t\t" << setw(7) << row[0] << setw(17) << row[1] << setw(14) << row[2] << setw(14) << row[3] << setw(10) << row[4] << setw(11) << row[5] << endl;
+            cout << "\t\t\t\t******************************************************************************" << endl;
+        }
+
+        cout << endl;
+        cout << "\t\t\t\t\t\tEnter fruit name: ";
+        cin.ignore();
+        getline(cin, name);
+        cin.clear();
+        cout << endl;
+
+        string data_query = "Select * from fruit_stock where Fruit_Name = '" + name + "'";
+        const char* dt = data_query.c_str();
+        qstate = mysql_query(conn, dt);
+
+        if (!qstate) {
+            res = mysql_store_result(conn);
+            if (res->row_count == 1) {
+                while ((row = mysql_fetch_row(res))) {
+                    price = row[4];
+                    cout << "\t\t\t\t\t\tEnter fruit weight in kg: ";
+                    cin >> kg;
+                    cout << endl << endl;
+                    double rm = stod(price);
+                    total = rm * kg;
+                    std::cout << "\t\t\t\t\t      " << name << " price for " << kg << " kilogram: RM ";
+                    cout << fixed <<setprecision(2) << total << std::endl;
+                    cout << endl;
+                }
+                
+            }
+
+            else {
+                cout << "\t\t\t\t\t\tFruit does not exist";
+                cout << endl << endl;
+            }
+
+        }
+
+        do {
+            cout << "\t\t\t\t\tDo you want to calculate price another fruit? (y/n): ";
+            cin >> choose;
+            if (choose == 'y' || choose == 'Y')
+                FruitPrice();
+            else if (choose == 'n' || choose == 'N')
+                MenuStaff();
+        } while (choose == 'y' || choose == 'Y' || choose == 'n' || choose == 'N');
+        
+    }
+
+   
+}
